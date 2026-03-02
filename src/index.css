@@ -1,0 +1,430 @@
+/* =========================================
+   1. RESET Y AJUSTES GLOBALES
+========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Evita scrolls raros */
+    background-color: #050507; /* Fondo oscuro por defecto */
+}
+
+/* Clases mágicas para la SPA (Navegación) */
+.hidden {
+    display: none !important;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   2. VISTA 1: INICIO (Minimalista Blanco)
+========================================= */
+.view-home {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(180deg, #ffffff 0%, #f0f2f5 100%);
+    width: 100%;
+    height: 100%;
+}
+
+.header-light {
+    padding-top: 4rem;
+    text-align: center;
+    width: 100%;
+}
+
+.logo-text {
+    font-size: 1.1rem;
+    color: #a0a0a0;
+    font-weight: 200;
+    letter-spacing: 4px;
+    display: flex;
+
+}
+
+.logo-text strong {
+    font-weight: 700;
+    color: #888;
+}
+
+.center-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.greeting-texts {
+    text-align: center;
+    z-index: 2;
+}
+
+.text-morning {
+    font-size: 1.6rem;
+    font-weight: 200;
+    color: #444;
+    margin-bottom: 0.3rem;
+}
+
+.text-name {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #2b4cff;
+    letter-spacing: 2px;
+    margin-bottom: 1.5rem;
+}
+
+.text-question {
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: #888;
+}
+
+.footer-light {
+    width: 100%;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 3rem;
+}
+
+.btn-ghost {
+    width: 100%;
+    max-width: 320px;
+    padding: 1.2rem;
+    background-color: rgba(240, 240, 240, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #555;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-ghost:active {
+    background-color: #e0e0e0;
+    transform: scale(0.98);
+}
+
+
+/* =========================================
+   3. VISTA 2: ACTITUD (Cristal / Modo Oscuro)
+========================================= */
+.view-ethereal {
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #050507; 
+    color: #ffffff;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; 
+}
+
+/* Luces flotantes de fondo (Auras) */
+.flare {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    z-index: 0;
+    opacity: 0.4;
+    animation: drift 8s infinite alternate ease-in-out;
+}
+
+.flare-1 {
+    width: 200px;
+    height: 200px;
+    background: #2b4cff;
+    top: -50px;
+    left: -50px;
+}
+
+.flare-2 {
+    width: 250px;
+    height: 250px;
+    background: #8e2de2;
+    bottom: 100px;
+    right: -80px;
+    animation-delay: -4s;
+}
+
+@keyframes drift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 40px) scale(1.2); }
+}
+
+/* Mantener el contenido por encima de las auras de luz */
+.header-dark, .progress-tabs, .question-header, .options-cloud, .footer-dark {
+    position: relative;
+    z-index: 1;
+}
+
+/* Cabecera oscura */
+.header-dark {
+    position: relative; /* Clave: esto permite posicionar la X de forma absoluta dentro del header */
+    display: flex;
+    justify-content: center; /* Esto fuerza a que el logo se quede matemáticamente en el centro */
+    align-items: center;
+    padding: 2rem 1.5rem 1rem 1.5rem;
+}
+
+.header-dark .logo-text { color: #888; }
+.header-dark .logo-text strong { color: #ccc; }
+
+/* El botón de la X para cerrar */
+.btn-icon {
+    position: absolute; 
+    right: 1.5rem;      
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 200;
+    cursor: pointer;
+}
+
+/* Pestañas (Tabs) */
+.progress-tabs {
+    display: flex;
+    padding: 0 1.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab {
+    flex: 1;
+    padding-bottom: 0.8rem;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: #666;
+    text-align: center;
+    position: relative;
+    transition: color 0.3s;
+}
+
+.tab.active { color: #ffffff; }
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #2b4cff;
+}
+
+/* Textos de la pregunta */
+.question-header {
+    text-align: center;
+    padding: 0 1.5rem;
+    margin-bottom: 3rem;
+    margin-top: 1rem;
+}
+
+.question-header h2 {
+    font-size: 2rem;
+    font-weight: 200;
+    margin-bottom: 0.5rem;
+}
+
+.text-glow {
+    color: #ffffff;
+    text-shadow: 0 0 15px rgba(43, 76, 255, 0.8);
+    font-weight: 400;
+}
+
+.question-header p {
+    font-size: 0.95rem;
+    color: #aaaaaa;
+    font-weight: 300;
+}
+
+/* === LA LISTA DE OPCIONES (Estilo Fila Premium) === */
+.options-cloud {
+    display: flex;
+    flex-direction: column; /* Lo ponemos en columna para que sean filas anchas como en Zara */
+    gap: 12px;
+    padding: 0 1.5rem;
+    flex-grow: 1;
+    width: 100%;
+}
+
+/* La tarjeta de cristal ancha */
+.glass-pill {
+    background: rgba(255, 255, 255, 0.05); 
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px); 
+    border: 1px solid rgba(255, 255, 255, 0.15); /* Borde un poco más marcado */
+    border-radius: 12px; /* Bordes más rectos y elegantes */
+    padding: 1.2rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    /* Flexbox para poner el título arriba y la descripción abajo, alineados a la izquierda */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem; /* Espacio entre título y descripción */
+    width: 100%; /* Ocupa todo el ancho disponible */
+}
+
+/* Título en blanco puro */
+.pill-title {
+    color: #ffffff; 
+    font-size: 1rem;
+    letter-spacing: 1px;
+    font-weight: 400;
+}
+
+/* Descripción ABAJO y en BLANCO (como pediste) */
+.pill-desc {
+    color: #ffffff; /* Blanco puro para máxima visibilidad */
+    font-size: 0.8rem;
+    font-weight: 200;
+    text-align: left;
+    opacity: 0.85; /* Un pelín de opacidad para que el título destaque más, pero sigue siendo súper blanco */
+}
+
+/* Efecto al seleccionar/tocar */
+.glass-pill:hover, .glass-pill.selected {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #ffffff; /* El borde se pone blanco fuerte al tocar */
+    transform: translateX(5px); /* Se mueve un poquito hacia la derecha en vez de hacia arriba */
+    box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.glass-pill:hover .pill-title, .glass-pill.selected .pill-title {
+    font-weight: 500;
+}
+
+/* Efecto al seleccionar/tocar píldoras */
+.glass-pill:hover, .glass-pill.selected {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.glass-pill:hover .pill-title, .glass-pill.selected .pill-title {
+    color: #ffffff;
+    font-weight: 400;
+}
+
+/* Botón inferior */
+.footer-dark {
+    padding: 2rem 1.5rem 3rem 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: #444; 
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.btn-text.active {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+
+/* Nuevos colores de luces para la fase de PLAN (Cálidos) */
+.flare-3 {
+    width: 220px;
+    height: 220px;
+    background: #ff4b72; /* Rosa/Rojo intenso */
+    top: -20px;
+    right: -50px;
+    animation-delay: -2s;
+}
+
+.flare-4 {
+    width: 280px;
+    height: 280px;
+    background: #ff914d; /* Naranja cálido */
+    bottom: 50px;
+    left: -80px;
+    animation-delay: -5s;
+}
+
+/* Modificador para que la píldora tenga el icono a la izquierda */
+.pill-row {
+    flex-direction: row; /* Fuerza a que se ponga en horizontal */
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.pill-icon {
+    font-size: 1.8rem; /* Emoji grande */
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); /* Sombra para que destaque en el cristal */
+    transition: transform 0.3s ease;
+}
+
+.glass-pill:hover .pill-icon, .glass-pill.selected .pill-icon {
+    transform: scale(1.15) rotate(-5deg); /* Pequeña animación al seleccionar */
+}
+
+/* Agrupador de textos para que sigan apilados */
+.pill-text-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+}
+
+/* Brillo especial para el botón "Personalizado" */
+.custom-glow {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+}
+
+/* Footer para dos botones (Atrás y Continuar) */
+.footer-double {
+    justify-content: space-between; /* Uno a la izquierda, otro a la derecha */
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+}
+
+.btn-secondary {
+    color: #666;
+}
+
+.btn-secondary:hover {
+    color: #aaaaaa;
+}
+
+/* Permitir scroll si la pantalla del móvil es muy pequeña */
+.scrollable {
+    overflow-y: auto;
+    padding-bottom: 2rem;
+}
