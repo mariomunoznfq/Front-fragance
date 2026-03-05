@@ -10,8 +10,6 @@ function ViewHome({ userName, onNext }) {
       <div className="center-stage">
         <div className="greeting-texts">
           <h2 className="text-morning">Buenos días</h2>
-
-          <h3 className="text-name">{userName ? userName.toUpperCase() : 'INVITADA'}</h3>
           <p className="text-question">¿Qué perfume usamos hoy?</p>
         </div>
       </div>

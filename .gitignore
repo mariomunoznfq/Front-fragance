@@ -1,0 +1,32 @@
+# Dependencias (¡NUNCA SE SUBE!)
+node_modules/
+
+# Archivos de construcción (Generados automáticamente al hacer el build)
+dist/
+dist-ssr/
+build/
+
+# Variables de Entorno (¡Tus secretos y URLs!)
+.env
+.env.*
+!.env.example
+
+# Logs de errores
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Configuración de tu editor de código (VS Code, etc.)
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
