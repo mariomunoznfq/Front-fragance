@@ -286,11 +286,11 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
     <main className="view-ethereal fade-in" style={{ background: 'linear-gradient(180deg, #050510 0%, #100520 100%)' }}>
       
       <input 
-        type="file" 
-        accept="image/*" 
-        ref={fileInputRef} 
-        style={{ display: 'none' }} 
-        onChange={handleImageUpload} 
+      type="file" 
+      accept="image/*, capture=camera" 
+      ref={fileInputRef} 
+      style={{ display: 'none' }} 
+      onChange={handleImageUpload} 
       />
 
       <div className="flare flare-1" style={{ background: 'rgba(0, 255, 255, 0.15)', top: '-10%', left: '10%' }}></div>
