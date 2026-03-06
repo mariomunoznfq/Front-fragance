@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 
 function ViewGender({ onNext, onBack, userData, setUserData }) {
-  // Leemos si ya había elegido algo antes, si no, lo dejamos en null
+  // Leemos si ya había elegido algo antes
   const [selected, setSelected] = useState(userData.gender || null);
 
   const handleSelect = (genderValue) => {
     setSelected(genderValue);
-    // Guardamos la elección en la "mochila" principal de datos
+    // Guardamos la elección en la "mochila"
     setUserData(prev => ({ ...prev, gender: genderValue }));
   };
 
   return (
     <main className="view-ethereal fade-in" style={{ background: 'linear-gradient(180deg, #050510 0%, #100520 100%)' }}>
       
-      {/* Luces de fondo (Flares) para mantener el diseño */}
       <div className="flare flare-1" style={{ background: 'rgba(0, 255, 255, 0.15)', top: '-10%', left: '10%' }}></div>
       <div className="flare flare-4" style={{ background: 'rgba(128, 0, 255, 0.2)', bottom: '-15%', right: '5%' }}></div>
 
@@ -22,34 +21,57 @@ function ViewGender({ onNext, onBack, userData, setUserData }) {
         <button className="btn-icon" onClick={onBack}>✕</button>
       </header>
 
-      {/* Como es una pregunta intermedia, podemos poner un indicador general o dejarlo limpio */}
-      <div className="question-header" style={{ marginTop: '40px' }}>
-        <h2>¿CUÁL ES TU <span className="text-glow" style={{ textShadow: '0 0 15px var(--cyan-glow)' }}>GÉNERO</span>?</h2>
+      <div className="question-header" style={{ marginTop: '10px' }}>
+        <h2>¿PARA <span className="text-glow" style={{ textShadow: '0 0 15px var(--cyan-glow)' }}>QUIÉN</span> ES?</h2>
         <p>Para afinar la precisión de la IA.</p>
       </div>
 
-      <div className="options-cloud">
-        {/* BOTÓN MASCULINO */}
+      <div className="options-cloud scrollable">
+        {/* BOTÓN MEN */}
         <button 
-          className={`glass-pill pill-row ${selected === 'MASCULINO' ? 'selected' : ''}`}
-          onClick={() => handleSelect('MASCULINO')}
-          style={selected === 'MASCULINO' ? { borderColor: 'var(--cyan-glow)', boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)' } : {}}
+          className={`glass-pill pill-row ${selected === 'MAN' ? 'selected' : ''}`}
+          onClick={() => handleSelect('MAN')}
+          style={selected === 'MAN' ? { borderColor: 'var(--cyan-glow)', boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)' } : {}}
         >
           <span className="pill-icon">♂️</span>
           <div className="pill-text-group" style={{ textAlign: 'left' }}>
-            <span className="pill-title">MASCULINO</span>
+            <span className="pill-title">MAN</span>
           </div>
         </button>
 
-        {/* BOTÓN FEMENINO */}
+        {/* BOTÓN WOMAN */}
         <button 
-          className={`glass-pill pill-row ${selected === 'FEMENINO' ? 'selected' : ''}`}
-          onClick={() => handleSelect('FEMENINO')}
-          style={selected === 'FEMENINO' ? { borderColor: 'var(--cyan-glow)', boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)' } : {}}
+          className={`glass-pill pill-row ${selected === 'WOMAN' ? 'selected' : ''}`}
+          onClick={() => handleSelect('WOMAN')}
+          style={selected === 'WOMAN' ? { borderColor: 'var(--cyan-glow)', boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)' } : {}}
         >
           <span className="pill-icon">♀️</span>
           <div className="pill-text-group" style={{ textAlign: 'left' }}>
-            <span className="pill-title">FEMENINO</span>
+            <span className="pill-title">WOMAN</span>
+          </div>
+        </button>
+
+        {/* BOTÓN BOYS */}
+        <button 
+          className={`glass-pill pill-row ${selected === 'BOYS' ? 'selected' : ''}`}
+          onClick={() => handleSelect('BOYS')}
+          style={selected === 'BOYS' ? { borderColor: 'var(--cyan-glow)', boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)' } : {}}
+        >
+          <span className="pill-icon">👦</span>
+          <div className="pill-text-group" style={{ textAlign: 'left' }}>
+            <span className="pill-title">BOYS</span>
+          </div>
+        </button>
+
+        {/* BOTÓN GIRLS */}
+        <button 
+          className={`glass-pill pill-row ${selected === 'GIRLS' ? 'selected' : ''}`}
+          onClick={() => handleSelect('GIRLS')}
+          style={selected === 'GIRLS' ? { borderColor: 'var(--cyan-glow)', boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)' } : {}}
+        >
+          <span className="pill-icon">👧</span>
+          <div className="pill-text-group" style={{ textAlign: 'left' }}>
+            <span className="pill-title">GIRLS</span>
           </div>
         </button>
       </div>
