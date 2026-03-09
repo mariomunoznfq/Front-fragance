@@ -6,34 +6,43 @@ import perfumesData from '../perfumes_zara.json';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// 1. EL BUSCADOR DE FOTOS DINÁMICO (A prueba de balas - INTACTO)
+// =========================================
+// 1. EL BUSCADOR DE FOTOS DINÁMICO (A PRUEBA DE BALAS)
+// =========================================
 const obtenerFotosDinamicas = (gender) => {
-  let searchCategory = '';
-  if (gender === 'MAN') searchCategory = 'man';
-  if (gender === 'WOMAN') searchCategory = 'woman';
-  if (gender === 'BOYS' || gender === 'GIRLS') searchCategory = 'kids';
+  // Le damos varias palabras clave por si en el JSON lo han escrito distinto
+  let keywords = [];
+  if (gender === 'MAN') keywords = ['man', 'hombre'];
+  if (gender === 'WOMAN') keywords = ['woman', 'mujer'];
+  if (gender === 'BOYS') keywords = ['boy', 'kid', 'niño'];
+  if (gender === 'GIRLS') keywords = ['girl', 'kid', 'niña'];
 
   let arrayPerfumes = perfumesData;
   
+  // Extraemos el array si el JSON viene envuelto en un objeto
   if (!Array.isArray(perfumesData)) {
     const key = Object.keys(perfumesData).find(k => Array.isArray(perfumesData[k]));
-    
     if (key) {
       arrayPerfumes = perfumesData[key];
     } else if (perfumesData.default && Array.isArray(perfumesData.default)) {
       arrayPerfumes = perfumesData.default;
     } else {
-      console.error("No se encontró ningún Array válido en el JSON:", perfumesData);
+      console.error("No se encontró ningún Array válido en el JSON.");
       return []; 
     }
   }
 
-  const perfumesValidos = arrayPerfumes.filter(
-    (p) => p.Category && p.Category.toLowerCase().includes(searchCategory) && p.Image
-  );
+  // 🔥 FILTRO MÁGICO: Busca si alguna de las palabras clave está en la categoría
+  const perfumesValidos = arrayPerfumes.filter((p) => {
+    if (!p.Category || !p.Image) return false;
+    const catLower = p.Category.toLowerCase();
+    // Devuelve true si encuentra 'boy', 'kid', etc.
+    return keywords.some(kw => catLower.includes(kw));
+  });
 
   if (perfumesValidos.length === 0) return [];
 
+  // Barajamos y sacamos 10
   const shuffled = perfumesValidos.sort(() => 0.5 - Math.random());
   const selectedPerfumes = shuffled.slice(0, 10);
 
@@ -44,14 +53,19 @@ const obtenerFotosDinamicas = (gender) => {
   }));
 };
 
+// =========================================
 // 2. COMPONENTE DEL CARRUSEL (Estilo ZARA)
+// =========================================
 const LoadingCarousel = ({ gender }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [fotosData, setFotosData] = useState([]);
 
   useEffect(() => {
+    // Aquí le pasamos el género para que sepa qué fotos buscar
     const fotos = obtenerFotosDinamicas(gender);
+    
     if (fotos.length === 0) {
+      // Foto comodín por si falla el JSON (Puedes poner aquí un logo de Zara si quieres)
       setFotosData([
         { id: 1, url: "https://static.zara.net/assets/public/a8d7/b27e/79c34c78b918/9962aec8f342/20210296999-e1/20210296999-e1.jpg", alt: "Default" }
       ]);
@@ -109,7 +123,9 @@ const LoadingCarousel = ({ gender }) => {
   );
 };
 
+// =========================================
 // 3. COMPONENTE PRINCIPAL DE LOOK (Estilo ZARA)
+// =========================================
 function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
   const [selected, setSelected] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -292,10 +308,26 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
             
             <img src={imagePreview} alt="Tu outfit" style={{ width: '100%', maxWidth: '280px', height: 'auto', objectFit: 'cover' }} />
             
+            {/* 🔥 NUEVO SPINNER ANIMADO ESTILO ZARA 🔥 */}
             {isDetectingLook ? (
-               <p style={{ color: '#000', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '2px', marginTop: '10px' }}>
-                 Escaneando prendas...
-               </p>
+               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '15px' }}>
+                 <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                   <circle cx="12" cy="12" r="10" stroke="#e5e5e5" strokeWidth="2"/>
+                   <path d="M12 2a10 10 0 0 1 10 10" stroke="#000" strokeWidth="2" strokeLinecap="round">
+                     <animateTransform 
+                       attributeName="transform" 
+                       type="rotate" 
+                       from="0 12 12" 
+                       to="360 12 12" 
+                       dur="0.8s" 
+                       repeatCount="indefinite" 
+                     />
+                   </path>
+                 </svg>
+                 <p style={{ color: '#757575', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '2px', marginTop: '12px', marginBottom: '0' }}>
+                   Analizando...
+                 </p>
+               </div>
             ) : (
                <div style={{ padding: '20px', border: '1px solid #e5e5e5', textAlign: 'center', width: '100%', maxWidth: '280px', boxSizing: 'border-box' }}>
                  <p className="zara-subtitle" style={{ fontSize: '0.7rem', letterSpacing: '2px', marginBottom: '10px' }}>LA IA HA DETECTADO UN LOOK</p>
