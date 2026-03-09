@@ -4,13 +4,12 @@ function ViewPlan({ onNext, onBack, setUserData }) {
   const [selectedPlan, setSelectedPlan] = useState('');
   const [customText, setCustomText] = useState('');
 
-  // Hemos añadido 'desc' para que encaje con el estilo 'pill-text-group' de ViewLookAnalysis
   const plans = [
-    { id: 'ia', label: 'PERSONALIZADO', icon: '🤖', desc: 'Define tu propio escenario con IA.' },
-    { id: 'trabajo', label: 'TRABAJO', icon: '💼', desc: 'Oficina, reuniones y enfoque.' },
-    { id: 'deporte', label: 'DEPORTE', icon: '⚡', desc: 'Gimnasio, aire libre y movimiento.' },
-    { id: 'cita', label: 'CITA', icon: '❤️', desc: 'Encuentro especial, romance.' },
-    { id: 'fiesta', label: 'FIESTA', icon: '✨', desc: 'Noche, música y energía.' },
+    { id: 'ia', label: 'PERSONALIZADO', desc: 'Define tu propio escenario con IA.' },
+    { id: 'trabajo', label: 'TRABAJO', desc: 'Oficina, reuniones y enfoque.' },
+    { id: 'deporte', label: 'DEPORTE',  desc: 'Gimnasio, aire libre y movimiento.' },
+    { id: 'cita', label: 'CITA', desc: 'Encuentro especial, romance.' },
+    { id: 'fiesta', label: 'FIESTA', desc: 'Noche, música y energía.' },
   ];
 
   const handleContinue = () => {
@@ -22,85 +21,89 @@ function ViewPlan({ onNext, onBack, setUserData }) {
   const isButtonDisabled = !selectedPlan || (selectedPlan === 'ia' && customText.trim() === '');
 
   return (
-    <main className="view-ethereal fade-in" style={{ background: 'linear-gradient(180deg, #050510 0%, #100520 100%)' }}>
+    <main className="zara-view-analysis fade-in">
       
-      {/* Luces de fondo (adaptadas del Look) */}
-      <div className="flare flare-1" style={{ background: 'rgba(0, 255, 255, 0.15)', top: '-10%', left: '10%' }}></div>
-      <div className="flare flare-4" style={{ background: 'rgba(128, 0, 255, 0.2)', bottom: '-15%', right: '5%' }}></div>
-
-      <header className="header-dark">
-        <div className="logo-text"><strong>IN</strong> ESSENCE AI</div>
-        <button className="btn-icon" onClick={onBack}>✕</button>
+      {/* Header Limpio */}
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <div className="zara-logo" style={{ fontSize: '1.2rem' }}><strong>IN</strong> ESSENCE AI</div>
+        <button onClick={onBack} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#000' }}>✕</button>
       </header>
 
       {/* Pestañas de progreso: Ahora PLAN es la activa */}
-      <div className="progress-tabs">
-        <div className="tab">ACTITUD</div>
-        <div className="tab active" style={{ borderColor: 'var(--cyan-glow)', color: 'var(--cyan-glow)' }}>PLAN</div>
-        <div className="tab">LOOK</div>
+      <div className="zara-tabs">
+        <div className="zara-tab">Actitud</div>
+        <div className="zara-tab active">Plan</div>
+        <div className="zara-tab">Look</div>
       </div>
 
-      <div className="question-header">
-        <h2>¿CUÁL ES EL <span className="text-glow" style={{ textShadow: '0 0 15px var(--cyan-glow)' }}>PLAN</span>?</h2>
-        <p>Dinos dónde vas para ajustar la intensidad.</p>
+      {/* Título de la sección */}
+      <div className="zara-title-container">
+        <h2 className="zara-title">¿Cuál es el plan?</h2>
+        <p className="zara-subtitle">Dinos dónde vas para ajustar la intensidad.</p>
       </div>
 
-      {/* Lista de opciones usando el estilo 'glass-pill' */}
-      <div className="options-cloud scrollable">
-        {plans.map((plan) => (
-          <button
-            key={plan.id}
-            className={`glass-pill pill-row ${selectedPlan === plan.id ? 'selected' : ''}`}
-            onClick={() => setSelectedPlan(plan.id)}
-            style={selectedPlan === plan.id ? { borderColor: 'var(--cyan-glow)', boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)' } : {}}
-          >
-            <span className="pill-icon">{plan.icon}</span>
-            <div className="pill-text-group" style={{ textAlign: 'left' }}>
-              <span className="pill-title">{plan.label}</span>
-              <span className="pill-desc">{plan.desc}</span>
+      {/* Lista de opciones (Estilo Grid de Zara) */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
+        <div className="zara-grid">
+          {plans.map((plan) => (
+            <div key={plan.id} style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+              
+              <button
+                className={`zara-card ${selectedPlan === plan.id ? 'selected' : ''}`}
+                onClick={() => setSelectedPlan(plan.id)}
+              >
+                <span style={{ fontSize: '1.5rem' }}>{plan.icon}</span>
+                <div>
+                  <div style={{ fontWeight: '500', fontSize: '0.9rem', letterSpacing: '1px', marginBottom: '4px' }}>{plan.label}</div>
+                  <div className="zara-card-desc">{plan.desc}</div>
+                </div>
+              </button>
+
+              {/* TARJETA IA: Textarea limpio, cuadrado y minimalista */}
+              {selectedPlan === 'ia' && plan.id === 'ia' && (
+                <div className="fade-in" style={{
+                  marginTop: '-1px', // Para que se pegue al botón de arriba
+                  border: '1px solid #000000',
+                  borderTop: 'none',
+                  backgroundColor: '#f9f9f9',
+                  padding: '15px',
+                  width: '100%',
+                  boxSizing: 'border-box'
+                }}>
+                  <textarea
+                    placeholder="Escribe aquí tu plan personalizado..."
+                    value={customText}
+                    onChange={(e) => setCustomText(e.target.value)}
+                    style={{
+                      width: '100%',
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#000000',
+                      outline: 'none',
+                      resize: 'none',
+                      height: '60px',
+                      fontSize: '0.8rem',
+                      fontFamily: 'inherit',
+                      letterSpacing: '1px'
+                    }}
+                  />
+                </div>
+              )}
+              
             </div>
-          </button>
-        ))}
-
-        {/* TARJETA IA: Adaptada para que parezca de cristal también */}
-        {selectedPlan === 'ia' && (
-          <div className="custom-input-card fade-in" style={{
-            margin: '10px 0',
-            background: 'rgba(255, 255, 255, 0.05)',
-            borderRadius: '15px',
-            border: '1px solid var(--cyan-glow)',
-            boxShadow: '0 0 10px rgba(0, 255, 255, 0.1)',
-            padding: '15px',
-            width: '100%',
-            boxSizing: 'border-box'
-          }}>
-            <textarea
-              placeholder="Escribe aquí tu plan personalizado..."
-              value={customText}
-              onChange={(e) => setCustomText(e.target.value)}
-              style={{
-                width: '100%',
-                background: 'transparent',
-                border: 'none',
-                color: 'white',
-                outline: 'none',
-                resize: 'none',
-                height: '60px',
-                fontSize: '0.9rem',
-                fontFamily: 'inherit'
-              }}
-            />
-          </div>
-        )}
+          ))}
+        </div>
       </div>
 
-      {/* Footer doble (Atrás + Continuar) */}
-      <footer className="footer-dark footer-double">
-        <button className="btn-text btn-secondary" onClick={onBack}>ATRÁS</button>
+      {/* Footer / Botones de Acción */}
+      <footer className="zara-footer-analysis">
+        <button className="zara-btn-back" onClick={onBack}>
+          ATRÁS
+        </button>
         <button 
-          className={`btn-text ${!isButtonDisabled ? 'active' : ''}`}
-          style={!isButtonDisabled ? { background: 'var(--cyan-glow)', color: '#000', boxShadow: '0 0 20px var(--cyan-glow)' } : {}}
-          onClick={!isButtonDisabled ? handleContinue : null}
+          className="zara-btn-next" 
+          onClick={handleContinue}
+          disabled={isButtonDisabled}
         >
           CONTINUAR
         </button>

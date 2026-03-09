@@ -1,102 +1,122 @@
 import React, { useState } from 'react';
 
 function ViewAttitude({ onNext, onBack, userData, setUserData }) {
-  // Leemos si ya había elegido algo antes (por si le da al botón "Atrás")
   const [selected, setSelected] = useState(
     userData.attitude && userData.attitude.length > 20 ? 'IA TEXT' : (userData.attitude || null)
   );
-  // Guardamos el texto libre del usuario
   const [customText, setCustomText] = useState(
     userData.attitude && userData.attitude.length > 20 ? userData.attitude : ''
   );
 
-  // Las 6 actitudes de tu contrato API + la opción IA
   const actitudes = [
-    { id: 7, icon: '🤖', title: 'IA TEXT', desc: 'Escribe cómo te sientes y la IA decidirá.' },
-    { id: 2, icon: '🧘', title: 'RELAJACION', desc: 'Calma, paz y fluidez.' },
-    { id: 3, icon: '✨', title: 'SOFISTICACION', desc: 'Elegancia en cada detalle.' },
-    { id: 4, icon: '🔥', title: 'ATREVIMIENTO', desc: 'Rompiendo las reglas.' },
-    { id: 5, icon: '😉', title: 'COQUETERIA', desc: 'Seducción y magnetismo.' },
-    { id: 6, icon: '⚡', title: 'ENERGIA', desc: 'Vitalidad pura y movimiento.' },
-    { id: 1, icon: '🛡️', title: 'SEGURIDAD', desc: 'Confianza y paso firme.' },
+    { id: 7, title: 'IA TEXT', desc: 'Escribe cómo te sientes y la IA decidirá.' },
+    { id: 2, title: 'RELAJACION', desc: 'Calma, paz y fluidez.' },
+    { id: 3, title: 'SOFISTICACION', desc: 'Elegancia en cada detalle.' },
+    { id: 4, title: 'ATREVIMIENTO', desc: 'Rompiendo las reglas.' },
+    { id: 5, title: 'COQUETERIA', desc: 'Seducción y magnetismo.' },
+    { id: 6, title: 'ENERGIA', desc: 'Vitalidad pura y movimiento.' },
+    { id: 1, title: 'SEGURIDAD', desc: 'Confianza y paso firme.' },
   ];
 
   const handleSelect = (title) => {
     setSelected(title);
     if (title !== 'IA TEXT') {
-      setCustomText(''); // Limpiamos el texto si elige una predefinida
+      setCustomText(''); 
     }
   };
 
   const handleNext = () => {
-    // Si eligió IA TEXT, guardamos su parrafada. Si no, guardamos el título de la pastilla.
     const finalAttitude = selected === 'IA TEXT' ? customText : selected.toLowerCase();
-    
     setUserData(prev => ({ ...prev, attitude: finalAttitude }));
     onNext();
   };
 
-  // Bloqueamos el botón "Siguiente" si no ha elegido nada, o si eligió IA pero no ha escrito nada
   const isNextDisabled = !selected || (selected === 'IA TEXT' && customText.trim().length < 5);
 
   return (
-    <main className="view-ethereal fade-in" style={{ background: 'linear-gradient(180deg, #050510 0%, #100520 100%)' }}>
+    <main className="zara-view-analysis fade-in">
       
-      <div className="flare flare-1" style={{ background: 'rgba(0, 255, 255, 0.15)', top: '-10%', left: '10%' }}></div>
-      <div className="flare flare-4" style={{ background: 'rgba(128, 0, 255, 0.2)', bottom: '-15%', right: '5%' }}></div>
-
-      <header className="header-dark">
-        <div className="logo-text"><strong>IN</strong> ESSENCE AI</div>
-        <button className="btn-icon" onClick={onBack}>✕</button>
+      {/* Header Limpio */}
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <div className="zara-logo" style={{ fontSize: '1.2rem' }}><strong>IN</strong> ESSENCE AI</div>
+        <button onClick={onBack} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#000' }}>✕</button>
       </header>
 
-      <div className="progress-tabs">
-        <div className="tab active" style={{ borderColor: 'var(--cyan-glow)', color: 'var(--cyan-glow)' }}>ACTITUD</div>
-        <div className="tab">PLAN</div>
-        <div className="tab">LOOK</div>
+      {/* Pestañas de progreso: Ahora ACTITUD es la activa */}
+      <div className="zara-tabs">
+        <div className="zara-tab active">Actitud</div>
+        <div className="zara-tab">Plan</div>
+        <div className="zara-tab">Look</div>
       </div>
 
-      <div className="question-header">
-        <h2>¿CUÁL ES TU <span className="text-glow">VIBRA</span>?</h2>
-        <p>Define tu estado de ánimo de hoy.</p>
+      {/* Título de la sección */}
+      <div className="zara-title-container">
+        <h2 className="zara-title">¿Cuál es tu vibra?</h2>
+        <p className="zara-subtitle">Define tu estado de ánimo de hoy.</p>
       </div>
 
-      <div className="options-cloud scrollable">
-        {actitudes.map((item) => (
-          <div key={item.id} style={{ width: '100%' }}>
-            <button 
-              className={`glass-pill pill-row ${selected === item.title ? 'selected' : ''}`}
-              onClick={() => handleSelect(item.title)}
-              style={selected === item.title ? { borderColor: 'var(--cyan-glow)', boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)' } : {}}
-            >
-              <span className="pill-icon">{item.icon}</span>
-              <div className="pill-text-group">
-                <span className="pill-title">{item.title}</span>
-                <span className="pill-desc">{item.desc}</span>
-              </div>
-            </button>
+      {/* Lista de opciones (Estilo Grid de Zara) */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
+        <div className="zara-grid">
+          {actitudes.map((item) => (
+            <div key={item.id} style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
+              
+              <button 
+                className={`zara-card ${selected === item.title ? 'selected' : ''}`}
+                onClick={() => handleSelect(item.title)}
+              >
+                <span style={{ fontSize: '1.5rem' }}>{item.icon}</span>
+                <div>
+                  <div style={{ fontWeight: '500', fontSize: '0.9rem', letterSpacing: '1px', marginBottom: '4px' }}>{item.title}</div>
+                  <div className="zara-card-desc">{item.desc}</div>
+                </div>
+              </button>
 
-            {/* Si el usuario pincha en IA TEXT, desplegamos la caja de texto justo debajo */}
-            {selected === 'IA TEXT' && item.title === 'IA TEXT' && (
-              <div className="custom-input-card">
-                <textarea 
-                  placeholder="Ej: Hoy me siento con ganas de relajarme y leer un libro en el sofá..."
-                  value={customText}
-                  onChange={(e) => setCustomText(e.target.value)}
-                  autoFocus
-                />
-              </div>
-            )}
-          </div>
-        ))}
+              {/* TARJETA IA: Textarea limpio, cuadrado y minimalista */}
+              {selected === 'IA TEXT' && item.title === 'IA TEXT' && (
+                <div className="fade-in" style={{
+                  marginTop: '-1px', // Para que se pegue al botón de arriba
+                  border: '1px solid #000000',
+                  borderTop: 'none',
+                  backgroundColor: '#f9f9f9',
+                  padding: '15px',
+                  width: '100%',
+                  boxSizing: 'border-box'
+                }}>
+                  <textarea 
+                    placeholder="Ej: Hoy me siento con ganas de relajarme y leer un libro en el sofá..."
+                    value={customText}
+                    onChange={(e) => setCustomText(e.target.value)}
+                    autoFocus
+                    style={{
+                      width: '100%',
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#000000',
+                      outline: 'none',
+                      resize: 'none',
+                      height: '60px',
+                      fontSize: '0.8rem',
+                      fontFamily: 'inherit',
+                      letterSpacing: '1px'
+                    }}
+                  />
+                </div>
+              )}
+
+            </div>
+          ))}
+        </div>
       </div>
 
-      <footer className="footer-dark footer-double">
-        <button className="btn-text btn-secondary" onClick={onBack}>ATRÁS</button>
+      {/* Footer / Botones de Acción */}
+      <footer className="zara-footer-analysis">
+        <button className="zara-btn-back" onClick={onBack}>
+          ATRÁS
+        </button>
         <button 
-          className={`btn-text ${!isNextDisabled ? 'active' : ''}`} 
-          style={!isNextDisabled ? { background: 'var(--cyan-glow)', color: '#000', boxShadow: '0 0 20px var(--cyan-glow)' } : { opacity: 0.5 }}
-          onClick={!isNextDisabled ? handleNext : null}
+          className="zara-btn-next" 
+          onClick={handleNext}
           disabled={isNextDisabled}
         >
           SIGUIENTE

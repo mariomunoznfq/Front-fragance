@@ -1,64 +1,71 @@
 import React, { useState } from 'react';
 
 function ViewKidsHero({ onNext, onBack, userData, setUserData }) {
-  const [selected, setSelected] = useState(userData.kidsHero || null);
+  const [selected, setSelected] = useState(userData.superheroe || null);
 
   const heroes = [
-    { id: 'spiderman', label: 'SPIDER-MAN', icon: '🕸️' },
-    { id: 'batman', label: 'BATMAN', icon: '🦇' },
-    { id: 'superman', label: 'SUPERMAN', icon: '🦸‍♂️' },
-    { id: 'wonderwoman', label: 'WONDER WOMAN', icon: '🦸‍♀️' },
-    { id: 'ironman', label: 'CATWOMAN', icon: '🐱' },
-    { id: 'capitanamerica', label: 'CAPITANA MARVEL', icon: '🦸‍♀️' },
+    { id: 'spiderman', label: 'SPIDER-MAN' },
+    { id: 'batman', label: 'BATMAN' },
+    { id: 'superman', label: 'SUPERMAN'},
+    { id: 'wonderwoman', label: 'WONDER WOMAN' },
+    { id: 'ironman', label: 'CATWOMAN'},
+    { id: 'capitanamerica', label: 'CAPITANA MARVEL'},
   ];
 
   const handleNext = () => {
-    setUserData(prev => ({ ...prev, kidsHero: selected }));
+    setUserData(prev => ({ ...prev, superheroe: selected }));
     onNext();
   };
 
   return (
-    <main className="view-ethereal fade-in" style={{ background: 'linear-gradient(180deg, #050510 0%, #100520 100%)' }}>
-      <div className="flare flare-1" style={{ background: 'rgba(0, 255, 255, 0.15)', top: '-10%', left: '10%' }}></div>
-      <div className="flare flare-4" style={{ background: 'rgba(128, 0, 255, 0.2)', bottom: '-15%', right: '5%' }}></div>
-
-      <header className="header-dark">
-        <div className="logo-text"><strong>IN</strong> ESSENCE AI</div>
-        <button className="btn-icon" onClick={onBack}>✕</button>
+    <main className="zara-view-analysis fade-in">
+      
+      {/* Header Estilo Zara */}
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <div className="zara-logo" style={{ fontSize: '1.2rem' }}><strong>IN</strong> ESSENCE AI</div>
+        <button onClick={onBack} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#000' }}>✕</button>
       </header>
 
-      <div className="progress-tabs">
-        <div className="tab">COLOR</div>
-        <div className="tab active" style={{ borderColor: 'var(--cyan-glow)', color: 'var(--cyan-glow)' }}>HÉROE</div>
-        <div className="tab">ANIMAL</div>
+      {/* Pestañas de progreso: HÉROE activa */}
+      <div className="zara-tabs">
+        <div className="zara-tab">Color</div>
+        <div className="zara-tab active">Héroe</div>
+        <div className="zara-tab">Animal</div>
       </div>
 
-      <div className="question-header">
-        <h2>TU <span className="text-glow">SÚPER HÉROE</span> FAVORITO</h2>
+      {/* Título de la sección */}
+      <div className="zara-title-container">
+        <h2 className="zara-title">Tu súper héroe</h2>
+        <p className="zara-subtitle">Elige a tu compañero de aventuras.</p>
       </div>
 
-      <div className="options-cloud scrollable">
-        {heroes.map((item) => (
-          <button 
-            key={item.id}
-            className={`glass-pill pill-row ${selected === item.label ? 'selected' : ''}`}
-            onClick={() => setSelected(item.label)}
-            style={selected === item.label ? { borderColor: 'var(--cyan-glow)', boxShadow: '0 0 15px rgba(0, 255, 255, 0.3)' } : {}}
-          >
-            <span className="pill-icon">{item.icon}</span>
-            <div className="pill-text-group" style={{ textAlign: 'left' }}>
-              <span className="pill-title">{item.label}</span>
-            </div>
-          </button>
-        ))}
+      {/* Grid de Héroes */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
+        <div className="zara-grid">
+          {heroes.map((item) => (
+            <button 
+              key={item.id}
+              className={`zara-card ${selected === item.label ? 'selected' : ''}`}
+              onClick={() => setSelected(item.label)}
+            >
+              <span style={{ fontSize: '1.5rem' }}>{item.icon}</span>
+              <div>
+                <div style={{ fontWeight: '500', fontSize: '0.85rem', letterSpacing: '1px' }}>{item.label}</div>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
 
-      <footer className="footer-dark footer-double">
-        <button className="btn-text btn-secondary" onClick={onBack}>ATRÁS</button>
+      {/* Footer con botones limpios */}
+      <footer className="zara-footer-analysis">
+        <button className="zara-btn-back" onClick={onBack}>
+          ATRÁS
+        </button>
         <button 
-          className={`btn-text ${selected ? 'active' : ''}`} 
-          style={selected ? { background: 'var(--cyan-glow)', color: '#000', boxShadow: '0 0 20px var(--cyan-glow)' } : { opacity: 0.5 }}
-          onClick={selected ? handleNext : null}
+          className="zara-btn-next" 
+          onClick={handleNext}
+          disabled={!selected}
         >
           SIGUIENTE
         </button>
