@@ -181,7 +181,7 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
         const responseLook = await fetch(`${API_BASE_URL}/generateLook`, {
           method: 'POST',
           headers: {
-            'auth-token': API_KEY
+            'X-API-Key': API_KEY
           },
           body: formData,
         });
@@ -227,7 +227,7 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
         // 2. FETCH CON AUTH-TOKEN EN FRAGANCIA NIÑOS
         responseFragance = await fetch(urlFragancia, { 
           method: 'GET',
-          headers: { 'auth-token': API_KEY }
+          headers: { 'X-API-Key': API_KEY }
         });
 
       } else {
@@ -242,7 +242,7 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
           // 3. FETCH CON AUTH-TOKEN SI SUBIÓ FOTO PERO NO SE PROCESÓ PREVIAMENTE
           const responseLook = await fetch(`${API_BASE_URL}/generateLook`, {
             method: 'POST',
-            headers: { 'auth-token': API_KEY },
+            headers: { 'X-API-Key': API_KEY },
             body: formData,
           });
           if (responseLook.ok) {
@@ -257,7 +257,7 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
           // 4. FETCH CON AUTH-TOKEN AL GENERAR PLAN PERSONALIZADO
           const responsePlan = await fetch(`${API_BASE_URL}/generatePlan?${planParams.toString()}`, { 
             method: 'GET',
-            headers: { 'auth-token': API_KEY }
+            headers: { 'X-API-Key': API_KEY }
           });
           if (responsePlan.ok) {
             const dataPlan = await responsePlan.json();
@@ -271,7 +271,7 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
            // 5. FETCH CON AUTH-TOKEN AL GENERAR ACTITUD PERSONALIZADA
            const responseActitudText = await fetch(`${API_BASE_URL}/generateActitud?${actitudParams.toString()}`, { 
              method: 'GET',
-             headers: { 'auth-token': API_KEY }
+             headers: { 'X-API-Key': API_KEY }
            });
            
            if (responseActitudText.ok) {
@@ -288,7 +288,7 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
         // 6. FETCH CON AUTH-TOKEN AL GENERAR FRAGANCIA ADULTOS
         responseFragance = await fetch(urlFragancia, { 
           method: 'GET',
-          headers: { 'auth-token': API_KEY }
+          headers: { 'X-API-Key': API_KEY }
         });
       }
 
