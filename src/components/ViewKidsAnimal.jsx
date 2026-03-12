@@ -156,11 +156,9 @@ function ViewKidsAnimal({ onNext, onBack, userData, setUserData }) {
       const urlFragancia = `${API_BASE_URL}/generateFraganceKids?${fraganceParams.toString()}`;
       
       const responseFragance = await fetch(urlFragancia, { 
-        method: 'GET',
-        headers: {
-          'auth-token': API_KEY 
-        }
-      });
+          method: 'GET',
+          headers: { 'X-API-Key': API_KEY }
+        });
       
       if (!responseFragance.ok) throw new Error(`Error: ${responseFragance.status}`);
       
