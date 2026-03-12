@@ -4,35 +4,44 @@ import React, { useState, useEffect } from 'react';
 import perfumesData from '../perfumes_zara.json'; 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_KEY = import.meta.env.VITE_API_KEY; // <--- LÍNEA CORREGIDA PARA QUE FUNCIONE EL FETCH
 
 // =========================================
-// 1. EL BUSCADOR DE FOTOS DINÁMICO (Estilo Zara)
+// 1. EL BUSCADOR DE FOTOS DINÁMICO (A prueba de balas)
 // =========================================
 const obtenerFotosDinamicas = (gender) => {
-  let searchCategory = '';
-  if (gender === 'MAN') searchCategory = 'man';
-  if (gender === 'WOMAN') searchCategory = 'woman';
-  if (gender === 'BOYS' || gender === 'GIRLS') searchCategory = 'kids';
+  let keywords = [];
+  // Ajustamos las palabras clave para que coincidan con la propiedad "Category" de tu JSON
+  if (gender === 'MAN') keywords = ['man'];
+  if (gender === 'WOMAN') keywords = ['woman'];
+  if (gender === 'BOYS') keywords = ['boy'];
+  if (gender === 'GIRLS') keywords = ['girl'];
 
-  let arrayPerfumes = perfumesData;
-  
-  if (!Array.isArray(perfumesData)) {
-    const key = Object.keys(perfumesData).find(k => Array.isArray(perfumesData[k]));
-    if (key) {
-      arrayPerfumes = perfumesData[key];
-    } else if (perfumesData.default && Array.isArray(perfumesData.default)) {
-      arrayPerfumes = perfumesData.default;
-    } else {
-      return []; 
+  // 🔥 EL RECOLECTOR ABSOLUTO 🔥
+  // Va a escanear todo el JSON, sin importar lo profundo que esté.
+  let todosLosPerfumes = [];
+
+  const extraerArrays = (nodo) => {
+    if (Array.isArray(nodo)) {
+      todosLosPerfumes = todosLosPerfumes.concat(nodo);
+    } else if (nodo && typeof nodo === 'object') {
+      Object.values(nodo).forEach(extraerArrays);
     }
-  }
+  };
 
-  const perfumesValidos = arrayPerfumes.filter(
-    (p) => p.Category && p.Category.toLowerCase().includes(searchCategory) && p.Image
-  );
+  // Lanzamos la recolección
+  extraerArrays(perfumesData);
+
+  // Ahora filtramos sobre TODOS los perfumes encontrados
+  const perfumesValidos = todosLosPerfumes.filter((p) => {
+    if (!p.Category || !p.Image) return false;
+    const catLower = p.Category.toLowerCase();
+    return keywords.some(kw => catLower.includes(kw));
+  });
 
   if (perfumesValidos.length === 0) return [];
 
+  // Barajamos y sacamos 10 aleatorios
   const shuffled = perfumesValidos.sort(() => 0.5 - Math.random());
   const selectedPerfumes = shuffled.slice(0, 10);
 
@@ -116,6 +125,9 @@ const LoadingCarousel = ({ gender }) => {
 function ViewKidsAnimal({ onNext, onBack, userData, setUserData }) {
   const [selected, setSelected] = useState(userData.animal || null);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Estado para controlar el error de la IA
+  const [hasError, setHasError] = useState(false);
 
   const animals = [
     { id: 'perro', label: 'PERRO'},
@@ -128,6 +140,7 @@ function ViewKidsAnimal({ onNext, onBack, userData, setUserData }) {
 
   const handleAnalyze = async () => {
     setIsLoading(true);
+    setHasError(false); // Reseteamos el estado de error por si acaso
     
     const updatedUserData = { ...userData, animal: selected };
     setUserData(updatedUserData);
@@ -142,11 +155,21 @@ function ViewKidsAnimal({ onNext, onBack, userData, setUserData }) {
 
       const urlFragancia = `${API_BASE_URL}/generateFraganceKids?${fraganceParams.toString()}`;
       
-      const responseFragance = await fetch(urlFragancia, { method: 'GET' });
+      const responseFragance = await fetch(urlFragancia, { 
+        method: 'GET',
+        headers: {
+          'auth-token': API_KEY 
+        }
+      });
       
       if (!responseFragance.ok) throw new Error(`Error: ${responseFragance.status}`);
       
       const dataFragance = await responseFragance.json();
+
+      // Verificamos si la IA falló o devolvió un objeto vacío/inválido
+      if (!dataFragance || dataFragance.error || (Array.isArray(dataFragance) && dataFragance.length === 0)) {
+        throw new Error("La IA no ha devuelto ninguna fragancia");
+      }
 
       setUserData(prev => ({ ...prev, fraganceData: dataFragance }));
       setIsLoading(false);
@@ -154,10 +177,26 @@ function ViewKidsAnimal({ onNext, onBack, userData, setUserData }) {
 
     } catch (error) {
       console.error('Error conectando con el backend:', error);
-      alert("Hubo un error de conexión con el servidor. ¡Revisa la consola!");
       setIsLoading(false);
+      setHasError(true); // MOSTRAMOS LA PANTALLA DE ERROR EN LUGAR DEL ALERT
     }
   };
+
+  // Pantalla de Error
+  if (hasError) {
+    return (
+      <main className="zara-view-analysis fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px', textAlign: 'center' }}>
+        <h2 className="zara-title" style={{ fontSize: '1.5rem', marginBottom: '15px' }}>¡UPS! ALGO HA SALIDO MAL</h2>
+        <button 
+          className="zara-btn-next" 
+          onClick={() => window.location.reload()} // Recarga la web y devuelve al Paso 1
+          style={{ width: '100%', maxWidth: '300px' }}
+        >
+          VOLVER AL INICIO
+        </button>
+      </main>
+    );
+  }
 
   if (isLoading) {
     return <LoadingCarousel gender={userData.gender} />;

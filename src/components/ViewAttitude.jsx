@@ -31,7 +31,8 @@ function ViewAttitude({ onNext, onBack, userData, setUserData }) {
     onNext();
   };
 
-  const isNextDisabled = !selected || (selected === 'IA TEXT' && customText.trim().length < 5);
+  // AQUÍ ESTÁ EL PRIMER CAMBIO: Validamos que tenga entre 3 y 100 caracteres
+  const isNextDisabled = !selected || (selected === 'IA TEXT' && (customText.trim().length < 3 || customText.trim().length > 100));
 
   return (
     <main className="zara-view-analysis fade-in">
@@ -88,6 +89,9 @@ function ViewAttitude({ onNext, onBack, userData, setUserData }) {
                     value={customText}
                     onChange={(e) => setCustomText(e.target.value)}
                     autoFocus
+                    // AQUÍ ESTÁ EL SEGUNDO CAMBIO: Límites en el input
+                    minLength={3}
+                    maxLength={100}
                     style={{
                       width: '100%',
                       background: 'transparent',

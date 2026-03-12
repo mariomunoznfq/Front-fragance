@@ -21,7 +21,14 @@ function ViewResult({ userData, onReset }) {
     }
 
     if (userData.fraganceData && Array.isArray(userData.fraganceData)) {
-      const sortedPerfumes = [...userData.fraganceData].sort((a, b) => {
+      
+      // 🔥 AQUÍ ESTÁ LA MAGIA: Limpiamos los duplicados usando el nombre del producto
+      const fraganciasUnicas = userData.fraganceData.filter((perfume, index, arrayOriginal) => 
+        index === arrayOriginal.findIndex((p) => p.NameProduct === perfume.NameProduct)
+      );
+
+      // Ahora ordenamos la lista que ya está limpia de duplicados
+      const sortedPerfumes = [...fraganciasUnicas].sort((a, b) => {
         const getPorcentaje = (moodString) => {
           if (!moodString) return 0;
           const numero = parseInt(moodString.replace(/\D/g, ''), 10);
@@ -29,7 +36,9 @@ function ViewResult({ userData, onReset }) {
         };
         return getPorcentaje(b.Mood) - getPorcentaje(a.Mood);
       });
+      
       setPerfumes(sortedPerfumes);
+      
     } else {
       console.warn("No se encontraron datos de fragancias en userData.");
     }

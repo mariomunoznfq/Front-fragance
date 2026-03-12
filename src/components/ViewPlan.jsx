@@ -18,7 +18,8 @@ function ViewPlan({ onNext, onBack, setUserData }) {
     onNext(); 
   };
 
-  const isButtonDisabled = !selectedPlan || (selectedPlan === 'ia' && customText.trim() === '');
+  // AQUÍ ESTÁ EL PRIMER CAMBIO: Validamos que tenga entre 3 y 100 caracteres
+  const isButtonDisabled = !selectedPlan || (selectedPlan === 'ia' && (customText.trim().length < 3 || customText.trim().length > 100));
 
   return (
     <main className="zara-view-analysis fade-in">
@@ -74,6 +75,9 @@ function ViewPlan({ onNext, onBack, setUserData }) {
                     placeholder="Escribe aquí tu plan personalizado..."
                     value={customText}
                     onChange={(e) => setCustomText(e.target.value)}
+                    // AQUÍ ESTÁ EL SEGUNDO CAMBIO: Límites en el input
+                    minLength={3}
+                    maxLength={100}
                     style={{
                       width: '100%',
                       background: 'transparent',
