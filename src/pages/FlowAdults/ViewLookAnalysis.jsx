@@ -17,7 +17,6 @@ const obtenerFotosDinamicas = (gender) => {
   if (gender === 'BOYS') keywords = ['boy', 'kid', 'niño'];
   if (gender === 'GIRLS') keywords = ['girl', 'kid', 'niña'];
 
-  // 🔥 EL RECOLECTOR ABSOLUTO 🔥
   let todosLosPerfumes = [];
 
   const extraerArrays = (nodo) => {
@@ -28,10 +27,8 @@ const obtenerFotosDinamicas = (gender) => {
     }
   };
 
-  // Lanzamos la recolección
   extraerArrays(perfumesData);
 
-  // Ahora filtramos sobre TODOS los perfumes encontrados
   const perfumesValidos = todosLosPerfumes.filter((p) => {
     if (!p.Category || !p.Image) return false;
     const catLower = p.Category.toLowerCase();
@@ -40,7 +37,6 @@ const obtenerFotosDinamicas = (gender) => {
 
   if (perfumesValidos.length === 0) return [];
 
-  // Barajamos y sacamos 10
   const shuffled = perfumesValidos.sort(() => 0.5 - Math.random());
   const selectedPerfumes = shuffled.slice(0, 10);
 
@@ -129,8 +125,6 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
   const [isDetectingLook, setIsDetectingLook] = useState(false);
   const [detectedLook, setDetectedLook] = useState(null);
   const fileInputRef = useRef(null);
-
-  // NUEVO: Estado para controlar cuando la IA falla o se queda sin tokens
   const [hasError, setHasError] = useState(false);
 
   const looks = [
@@ -164,7 +158,7 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
 
       setIsDetectingLook(true); 
       setDetectedLook(null);
-      setHasError(false); // Reseteamos el error por si acaso
+      setHasError(false);
       const options = { maxSizeMB: 0.9, maxWidthOrHeight: 1200, useWebWorker: true };
 
       try {
@@ -172,12 +166,10 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
         const imageUrl = URL.createObjectURL(compressedFile);
         setImagePreview(imageUrl);
         setSelected('IA SCAN');
-        setUserData(prev => ({ ...prev, look: 'IA SCAN', lookImage: compressedFile }));
 
         const formData = new FormData();
         formData.append('foto', compressedFile);
 
-        // 1. FETCH CON AUTH-TOKEN AL SUBIR LA IMAGEN
         const responseLook = await fetch(`${API_BASE_URL}/generateLook`, {
           method: 'POST',
           headers: {
@@ -188,19 +180,34 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
 
         if (responseLook.ok) {
           const dataLook = await responseLook.json();
-          // Controlamos que realmente haya devuelto un look
           if (!dataLook || !dataLook.look) throw new Error("Sin respuesta de la IA");
-          setDetectedLook(dataLook.look); 
-          setUserData(prev => ({ ...prev, look: dataLook.look })); 
+
+          const lookDetectado = dataLook.look;
+          setDetectedLook(lookDetectado);
+
+          // ✅ FIX: Guardamos look, lookImage Y detectedLook en userData
+          // así handleAnalyze siempre tiene el look disponible sin re-llamar /generateLook
+          setUserData(prev => ({
+            ...prev,
+            look: lookDetectado,
+            lookImage: compressedFile,
+            detectedLook: lookDetectado
+          }));
         } else {
           setDetectedLook("Desconocido");
+          setUserData(prev => ({
+            ...prev,
+            look: 'Desconocido',
+            lookImage: compressedFile,
+            detectedLook: 'Desconocido'
+          }));
         }
       } catch (error) {
         console.error('Error al procesar la foto:', error);
-        // Si falla la IA detectando la foto, mostramos un aviso pero le dejamos elegir manual
         alert("Nuestra IA está un poco saturada ahora mismo y no ha podido analizar tu foto. Por favor, selecciona un look manualmente.");
         setSelected(null);
         setImagePreview(null);
+        setUserData(prev => ({ ...prev, look: null, lookImage: null, detectedLook: null }));
       } finally {
         setIsDetectingLook(false);
       }
@@ -224,37 +231,21 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
         });
         const urlFragancia = `${API_BASE_URL}/generateFraganceKids?${fraganceParams.toString()}`;
         
-        // 2. FETCH CON AUTH-TOKEN EN FRAGANCIA NIÑOS
         responseFragance = await fetch(urlFragancia, { 
           method: 'GET',
           headers: { 'X-API-Key': API_KEY }
         });
 
       } else {
+        // ✅ FIX: Usamos userData.look directamente (ya viene procesado desde handleImageUpload)
+        // Eliminamos el bloque if (userData.lookImage && !detectedLook) que causaba la doble llamada
         let finalLook = userData.look;
         let finalActitud = userData.attitude;
         let finalPlan = userData.plan;
 
-        if (userData.lookImage && !detectedLook) {
-          const formData = new FormData();
-          formData.append('foto', userData.lookImage);
-
-          // 3. FETCH CON AUTH-TOKEN SI SUBIÓ FOTO PERO NO SE PROCESÓ PREVIAMENTE
-          const responseLook = await fetch(`${API_BASE_URL}/generateLook`, {
-            method: 'POST',
-            headers: { 'X-API-Key': API_KEY },
-            body: formData,
-          });
-          if (responseLook.ok) {
-            const dataLook = await responseLook.json();
-            finalLook = dataLook.look; 
-          }
-        }
-
         const planesPredefinidos = ['FIESTA', 'TRABAJO', 'DEPORTE', 'CITA'];
         if (userData.plan && !planesPredefinidos.includes(userData.plan)) { 
           const planParams = new URLSearchParams({ descripcion: userData.plan });
-          // 4. FETCH CON AUTH-TOKEN AL GENERAR PLAN PERSONALIZADO
           const responsePlan = await fetch(`${API_BASE_URL}/generatePlan?${planParams.toString()}`, { 
             method: 'GET',
             headers: { 'X-API-Key': API_KEY }
@@ -267,25 +258,26 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
 
         const actitudesPredefinidas = ['seguridad', 'relajacion', 'sofisticacion', 'atrevimiento', 'coqueteria', 'energia'];
         if (userData.attitude && !actitudesPredefinidas.includes(userData.attitude.toLowerCase())) {
-           const actitudParams = new URLSearchParams({ descripcion: userData.attitude });
-           // 5. FETCH CON AUTH-TOKEN AL GENERAR ACTITUD PERSONALIZADA
-           const responseActitudText = await fetch(`${API_BASE_URL}/generateActitud?${actitudParams.toString()}`, { 
-             method: 'GET',
-             headers: { 'X-API-Key': API_KEY }
-           });
-           
-           if (responseActitudText.ok) {
-              const dataActitudText = await responseActitudText.json();
-              finalActitud = dataActitudText.actitud;
-           }
+          const actitudParams = new URLSearchParams({ descripcion: userData.attitude });
+          const responseActitudText = await fetch(`${API_BASE_URL}/generateActitud?${actitudParams.toString()}`, { 
+            method: 'GET',
+            headers: { 'X-API-Key': API_KEY }
+          });
+          
+          if (responseActitudText.ok) {
+            const dataActitudText = await responseActitudText.json();
+            finalActitud = dataActitudText.actitud;
+          }
         }
 
         const fraganceParams = new URLSearchParams({
-          actitud: finalActitud || '', plan: finalPlan || '', look: finalLook || '', genero: userData.gender || ''
+          actitud: finalActitud || '',
+          plan: finalPlan || '',
+          look: finalLook || '',
+          genero: userData.gender || ''
         });
 
         const urlFragancia = `${API_BASE_URL}/generateFraganceAdult?${fraganceParams.toString()}`;
-        // 6. FETCH CON AUTH-TOKEN AL GENERAR FRAGANCIA ADULTOS
         responseFragance = await fetch(urlFragancia, { 
           method: 'GET',
           headers: { 'X-API-Key': API_KEY }
@@ -296,7 +288,6 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
       
       const dataFragance = await responseFragance.json();
       
-      // NUEVO: Verificamos si la IA falló o devolvió un objeto vacío/inválido
       if (!dataFragance || dataFragance.error || (Array.isArray(dataFragance) && dataFragance.length === 0)) {
         throw new Error("La IA no ha devuelto ninguna fragancia");
       }
@@ -308,18 +299,18 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
     } catch (error) {
       console.error('Error conectando con el backend:', error);
       setIsLoading(false);
-      setHasError(true); // MOSTRAMOS LA PANTALLA DE ERROR
+      setHasError(true);
     }
   };
 
-  // NUEVO: Pantalla de Error
+  // Pantalla de Error
   if (hasError) {
     return (
       <main className="zara-view-analysis fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px', textAlign: 'center' }}>
         <h2 className="zara-title" style={{ fontSize: '1.5rem', marginBottom: '15px' }}>¡UPS! ALGO HA SALIDO MAL</h2>
         <button 
           className="zara-btn-next" 
-          onClick={() => window.location.reload()} // Recarga la web y devuelve al Paso 1
+          onClick={() => window.location.reload()}
           style={{ width: '100%', maxWidth: '300px' }}
         >
           VOLVER AL INICIO
