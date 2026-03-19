@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import imageCompression from 'browser-image-compression';
 
 // IMPORTA TU JSON AQUÍ (Ajusta la ruta si es necesario)
-import perfumesData from '../perfumes_zara.json'; 
+import perfumesData from '../../data/perfumes_zara.json'; 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const API_KEY = import.meta.env.VITE_API_KEY;

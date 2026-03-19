@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // IMPORTAMOS EL JSON PARA EL CARRUSEL DINÁMICO
-import perfumesData from '../perfumes_zara.json'; 
+import perfumesData from '../../data/perfumes_zara.json'; 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const API_KEY = import.meta.env.VITE_API_KEY; // <--- LÍNEA CORREGIDA PARA QUE FUNCIONE EL FETCH

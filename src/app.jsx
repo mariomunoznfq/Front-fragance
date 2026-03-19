@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
-import ViewGender from './components/ViewGender';
-import ViewHome from './components/ViewHome';
-import ViewAttitude from './components/ViewAttitude';
-import ViewPlan from './components/ViewPlan';
-import ViewLookAnalysis from './components/ViewLookAnalysis'; 
-import ViewResult from './components/ViewResult'; 
+import ViewGender from './pages/Gender/ViewGender';
+import ViewHome from './pages/Home/ViewHome';
+import ViewAttitude from './pages/FlowAdults/ViewAttitude';
+import ViewPlan from './pages/FlowAdults/ViewPlan';
+import ViewLookAnalysis from './pages/FlowAdults/ViewLookAnalysis'; 
+import ViewResult from './pages/Result/ViewResult'; 
 
-// Importamos las 3 pantallas nuevas de niños
-import ViewKidsColor from './components/ViewKidsColor';
-import ViewKidsHero from './components/ViewKidsHero';
-import ViewKidsAnimal from './components/ViewKidsAnimal';
+import ViewKidsColor from './pages/FlowKids/ViewKidsColor';
+import ViewKidsHero from './pages/FlowKids/ViewKidsHero';
+import ViewKidsAnimal from './pages/FlowKids/ViewKidsAnimal';
 
-import './index.css';
+import './styles/index.css';
 
 function App() {
   const [currentStep, setCurrentStep] = useState(1);
