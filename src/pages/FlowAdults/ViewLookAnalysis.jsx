@@ -125,7 +125,9 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
   const [isDetectingLook, setIsDetectingLook] = useState(false);
   const [detectedLook, setDetectedLook] = useState(null);
   const fileInputRef = useRef(null);
-  const [hasError, setHasError] = useState(false);
+  
+  // ✅ ESTADO DE ERROR ACTUALIZADO
+  const [apiError, setApiError] = useState(null);
 
   const looks = [
     { id: 6, title: 'IA SCAN', desc: 'Sube una foto y deja que la IA decida.' },
@@ -158,7 +160,7 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
 
       setIsDetectingLook(true); 
       setDetectedLook(null);
-      setHasError(false);
+      setApiError(null); // Reseteamos error previo
       const options = { maxSizeMB: 0.9, maxWidthOrHeight: 1200, useWebWorker: true };
 
       try {
@@ -185,8 +187,6 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
           const lookDetectado = dataLook.look;
           setDetectedLook(lookDetectado);
 
-          // ✅ FIX: Guardamos look, lookImage Y detectedLook en userData
-          // así handleAnalyze siempre tiene el look disponible sin re-llamar /generateLook
           setUserData(prev => ({
             ...prev,
             look: lookDetectado,
@@ -216,7 +216,7 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
 
   const handleAnalyze = async () => {
     setIsLoading(true);
-    setHasError(false);
+    setApiError(null); // Reseteamos error previo
 
     try {
       const isKid = userData.gender === 'BOYS' || userData.gender === 'GIRLS';
@@ -237,8 +237,6 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
         });
 
       } else {
-        // ✅ FIX: Usamos userData.look directamente (ya viene procesado desde handleImageUpload)
-        // Eliminamos el bloque if (userData.lookImage && !detectedLook) que causaba la doble llamada
         let finalLook = userData.look;
         let finalActitud = userData.attitude;
         let finalPlan = userData.plan;
@@ -284,7 +282,30 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
         });
       }
 
-      if (!responseFragance.ok) throw new Error(`Error en el servidor: ${responseFragance.status}`);
+      // ✅ MANEJO DE ERRORES CON STATUS CODES
+      if (!responseFragance.ok) {
+        let mensajeError = "";
+        switch (responseFragance.status) {
+          case 400:
+            mensajeError = "Datos incompletos o solicitud mal formada.";
+            break;
+          case 401:
+            mensajeError = "Falta la API Key o es inválida.";
+            break;
+          case 422:
+            mensajeError = "Los parámetros enviados no tienen un formato válido.";
+            break;
+          case 429:
+            mensajeError = "Has superado el límite de peticiones. Espera un momento.";
+            break;
+          case 500:
+            mensajeError = "Error interno del servidor. Inténtalo más tarde.";
+            break;
+          default:
+            mensajeError = `Error inesperado en el servidor (${responseFragance.status}).`;
+        }
+        throw new Error(mensajeError); 
+      }
       
       const dataFragance = await responseFragance.json();
       
@@ -299,21 +320,27 @@ function ViewLookAnalysis({ onNext, onBack, userData, setUserData }) {
     } catch (error) {
       console.error('Error conectando con el backend:', error);
       setIsLoading(false);
-      setHasError(true);
+      // ✅ GUARDAMOS EL MENSAJE DE ERROR
+      setApiError(error.message || "Error de conexión. Verifica tu internet e inténtalo de nuevo.");
     }
   };
 
-  // Pantalla de Error
-  if (hasError) {
+  // ✅ PANTALLA DE ERROR ACTUALIZADA
+  if (apiError) {
     return (
       <main className="zara-view-analysis fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px', textAlign: 'center' }}>
         <h2 className="zara-title" style={{ fontSize: '1.5rem', marginBottom: '15px' }}>¡UPS! ALGO HA SALIDO MAL</h2>
+        
+        <p style={{ color: '#757575', marginBottom: '30px', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.85rem' }}>
+          {apiError}
+        </p>
+
         <button 
           className="zara-btn-next" 
-          onClick={() => window.location.reload()}
+          onClick={() => setApiError(null)}
           style={{ width: '100%', maxWidth: '300px' }}
         >
-          VOLVER AL INICIO
+          VOLVER A INTENTAR
         </button>
       </main>
     );

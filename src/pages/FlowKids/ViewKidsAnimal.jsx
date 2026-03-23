@@ -4,21 +4,18 @@ import React, { useState, useEffect } from 'react';
 import perfumesData from '../../data/perfumes_zara.json'; 
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const API_KEY = import.meta.env.VITE_API_KEY; // <--- LÍNEA CORREGIDA PARA QUE FUNCIONE EL FETCH
+const API_KEY = import.meta.env.VITE_API_KEY; 
 
 // =========================================
 // 1. EL BUSCADOR DE FOTOS DINÁMICO (A prueba de balas)
 // =========================================
 const obtenerFotosDinamicas = (gender) => {
   let keywords = [];
-  // Ajustamos las palabras clave para que coincidan con la propiedad "Category" de tu JSON
   if (gender === 'MAN') keywords = ['man'];
   if (gender === 'WOMAN') keywords = ['woman'];
   if (gender === 'BOYS') keywords = ['boy'];
   if (gender === 'GIRLS') keywords = ['girl'];
 
-  // 🔥 EL RECOLECTOR ABSOLUTO 🔥
-  // Va a escanear todo el JSON, sin importar lo profundo que esté.
   let todosLosPerfumes = [];
 
   const extraerArrays = (nodo) => {
@@ -29,10 +26,8 @@ const obtenerFotosDinamicas = (gender) => {
     }
   };
 
-  // Lanzamos la recolección
   extraerArrays(perfumesData);
 
-  // Ahora filtramos sobre TODOS los perfumes encontrados
   const perfumesValidos = todosLosPerfumes.filter((p) => {
     if (!p.Category || !p.Image) return false;
     const catLower = p.Category.toLowerCase();
@@ -41,7 +36,6 @@ const obtenerFotosDinamicas = (gender) => {
 
   if (perfumesValidos.length === 0) return [];
 
-  // Barajamos y sacamos 10 aleatorios
   const shuffled = perfumesValidos.sort(() => 0.5 - Math.random());
   const selectedPerfumes = shuffled.slice(0, 10);
 
@@ -126,8 +120,8 @@ function ViewKidsAnimal({ onNext, onBack, userData, setUserData }) {
   const [selected, setSelected] = useState(userData.animal || null);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Estado para controlar el error de la IA
-  const [hasError, setHasError] = useState(false);
+  // ✅ ESTADO DE ERROR ACTUALIZADO
+  const [apiError, setApiError] = useState(null);
 
   const animals = [
     { id: 'perro', label: 'PERRO'},
@@ -140,7 +134,7 @@ function ViewKidsAnimal({ onNext, onBack, userData, setUserData }) {
 
   const handleAnalyze = async () => {
     setIsLoading(true);
-    setHasError(false); // Reseteamos el estado de error por si acaso
+    setApiError(null); 
     
     const updatedUserData = { ...userData, animal: selected };
     setUserData(updatedUserData);
@@ -160,11 +154,33 @@ function ViewKidsAnimal({ onNext, onBack, userData, setUserData }) {
           headers: { 'X-API-Key': API_KEY }
         });
       
-      if (!responseFragance.ok) throw new Error(`Error: ${responseFragance.status}`);
+      // ✅ MANEJO DE ERRORES CON LOS TEXTOS EXACTOS DE LOS ADULTOS
+      if (!responseFragance.ok) {
+        let mensajeError = "";
+        switch (responseFragance.status) {
+          case 400:
+            mensajeError = "Datos incompletos o solicitud mal formada.";
+            break;
+          case 401:
+            mensajeError = "Falta la API Key o es inválida.";
+            break;
+          case 422:
+            mensajeError = "Los parámetros enviados no tienen un formato válido.";
+            break;
+          case 429:
+            mensajeError = "Has superado el límite de peticiones. Espera un momento.";
+            break;
+          case 500:
+            mensajeError = "Error interno del servidor. Inténtalo más tarde.";
+            break;
+          default:
+            mensajeError = `Error inesperado en el servidor (${responseFragance.status}).`;
+        }
+        throw new Error(mensajeError); 
+      }
       
       const dataFragance = await responseFragance.json();
 
-      // Verificamos si la IA falló o devolvió un objeto vacío/inválido
       if (!dataFragance || dataFragance.error || (Array.isArray(dataFragance) && dataFragance.length === 0)) {
         throw new Error("La IA no ha devuelto ninguna fragancia");
       }
@@ -176,21 +192,26 @@ function ViewKidsAnimal({ onNext, onBack, userData, setUserData }) {
     } catch (error) {
       console.error('Error conectando con el backend:', error);
       setIsLoading(false);
-      setHasError(true); // MOSTRAMOS LA PANTALLA DE ERROR EN LUGAR DEL ALERT
+      // ✅ EL MISMO MENSAJE DE FALLO DE RED
+      setApiError(error.message || "Error de conexión. Verifica tu internet e inténtalo de nuevo.");
     }
   };
 
-  // Pantalla de Error
-  if (hasError) {
+  if (apiError) {
     return (
       <main className="zara-view-analysis fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '20px', textAlign: 'center' }}>
         <h2 className="zara-title" style={{ fontSize: '1.5rem', marginBottom: '15px' }}>¡UPS! ALGO HA SALIDO MAL</h2>
+        
+        <p style={{ color: '#757575', marginBottom: '30px', textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.85rem' }}>
+          {apiError}
+        </p>
+
         <button 
           className="zara-btn-next" 
-          onClick={() => window.location.reload()} // Recarga la web y devuelve al Paso 1
+          onClick={() => setApiError(null)} 
           style={{ width: '100%', maxWidth: '300px' }}
         >
-          VOLVER AL INICIO
+          VOLVER A INTENTAR
         </button>
       </main>
     );
@@ -204,26 +225,22 @@ function ViewKidsAnimal({ onNext, onBack, userData, setUserData }) {
   return (
     <main className="zara-view-analysis fade-in">
       
-      {/* Header Limpio */}
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
         <div className="zara-logo" style={{ fontSize: '1.2rem' }}><strong>IN</strong> ESSENCE AI</div>
         <button onClick={onBack} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#000' }}>✕</button>
       </header>
 
-      {/* Navegación por pasos (Tabs Niños) */}
       <div className="zara-tabs">
         <div className="zara-tab">Color</div>
         <div className="zara-tab">Héroe</div>
         <div className="zara-tab active">Animal</div>
       </div>
 
-      {/* Título de la sección */}
       <div className="zara-title-container">
         <h2 className="zara-title">Tu animal favorito</h2>
         <p className="zara-subtitle">El toque final para tu fragancia.</p>
       </div>
 
-      {/* Grid de Opciones (Botones Zara) */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
         <div className="zara-grid">
           {animals.map((item) => (
@@ -243,7 +260,6 @@ function ViewKidsAnimal({ onNext, onBack, userData, setUserData }) {
         </div>
       </div>
 
-      {/* Footer / Botones de Acción */}
       <footer className="zara-footer-analysis">
         <button className="zara-btn-back" onClick={onBack} disabled={isLoading}>
           ATRÁS
