@@ -7,7 +7,7 @@ import './styles/index.css'
 import ReactGA from "react-ga4";
 
 // 2. Inicializar con tu ID de medición
-ReactGA.initialize("G-YBSZ84J0Q1");
+ReactGA.initialize(import.meta.env.VITE_GA_MEASUREMENT_ID);
 
 // 3. Registrar la primera visita nada más cargar la app
 ReactGA.send({ hitType: "pageview", page: window.location.pathname, title: "Inicio In Essence" });
