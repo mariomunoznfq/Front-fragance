@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+// 🔥 1. IMPORTAMOS GOOGLE ANALYTICS
+import ReactGA from "react-ga4";
 
 // Helpers
 const getCookie = (name) => {
@@ -89,6 +91,13 @@ function ViewResult({ userData = {}, onReset }) {
             className="zara-btn-next"
             style={{ width: '100%', maxWidth: 400, marginBottom: 40 }}
             onClick={() => {
+              // 🔥 2. REGISTRAMOS CUÁNDO HACEN CLIC EN COMPRAR
+              ReactGA.event({
+                category: "Ecommerce",
+                action: "Click_Comprar",
+                label: selectedPerfume.NameProduct // Aquí le mandamos el nombre exacto del perfume
+              });
+
               if (selectedPerfume.ProductLink) window.open(selectedPerfume.ProductLink, '_blank');
               else alert('El enlace a la tienda no está disponible para este perfume.');
             }}
@@ -123,7 +132,20 @@ function ViewResult({ userData = {}, onReset }) {
           <>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 2, maxWidth: 800, width: '100%', margin: '0 auto' }}>
               {displayedPerfumes.map((p, i) => (
-                <div key={i} onClick={() => setSelectedPerfume(p)} style={{ cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }} className="fade-in">
+                <div 
+                  key={i} 
+                  onClick={() => {
+                    // 🔥 3. REGISTRAMOS QUÉ PERFUME ELIGEN VER EN DETALLE
+                    ReactGA.event({
+                      category: "Interaccion",
+                      action: "Ver_Detalle_Perfume",
+                      label: p.NameProduct // El nombre del perfume
+                    });
+                    setSelectedPerfume(p);
+                  }} 
+                  style={{ cursor: 'pointer', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }} 
+                  className="fade-in"
+                >
                   <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4', backgroundColor: '#f5f5f5', overflow: 'hidden' }}>
                     {p.Mood && (
                       <div style={{ position: 'absolute', top: 10, right: 10, background: 'rgba(255,255,255,0.9)', color: '#000', fontSize: '0.65rem', fontWeight: 500, padding: '4px 6px', letterSpacing: 1, border: '1px solid #e5e5e5', zIndex: 5 }}>{p.Mood}</div>
