@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+// 🔥 1. IMPORTAMOS GOOGLE ANALYTICS
+import ReactGA from "react-ga4";
 
 function ViewGender({ onNext, onBack, userData, setUserData }) {
   const [selected, setSelected] = useState(userData.gender || null);
@@ -61,7 +63,16 @@ function ViewGender({ onNext, onBack, userData, setUserData }) {
         </button>
         <button 
           className="zara-btn-next" 
-          onClick={onNext}
+          onClick={() => {
+            // 🔥 2. REGISTRAMOS LA ELECCIÓN EN GOOGLE ANALYTICS
+            ReactGA.event({
+              category: "Navegacion",
+              action: "Seleccion_Genero",
+              label: selected // Esto enviará "WOMAN", "MAN", "GIRLS" o "BOYS"
+            });
+            
+            onNext(); // Continuamos al siguiente paso
+          }}
           disabled={!selected}
         >
           SIGUIENTE
