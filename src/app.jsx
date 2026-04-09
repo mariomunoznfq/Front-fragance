@@ -19,7 +19,7 @@ function App() {
 
   // Añadimos las variables de los niños a la mochila
   const [userData, setUserData] = useState({
-    na: '',
+    name: '',
     gender: '',
     attitude: '',
     plan: '',
